@@ -22,6 +22,13 @@ configure do
 			content TEXT,
 			created_date DATE
 		)'
+	@db.execute	'CREATE TABLE IF NOT EXISTS	Comments
+		(
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			content TEXT,
+			created_date DATE,
+			post_id INTEGER
+		)'
 end
 
 get '/' do
@@ -53,12 +60,27 @@ get '/posts/:post_id' do
 	results = @db.execute 'select * from Posts where id=?', [post_id]
 	@row = results[0]
 
+	@comments = @db.execute 'select * from Comments where post_id = ? order by id', [post_id]
+
 	erb :posts
 end
 
 post '/posts/:post_id' do
 	post_id = params[:post_id]
-	content = params[:content]
+	content = params[:content]	
 
-	erb "You typed comment #{content} for post #{post_id}"
+	@db.execute 'insert into Comments
+		(
+			content,
+			created_date,
+			post_id
+		)
+			values
+		(
+			?,
+			datetime(),
+			?
+		)', [content, post_id]
+
+	redirect to('/posts/' + post_id)
 end
