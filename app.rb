@@ -29,16 +29,16 @@ get '/' do
 	erb :index
 end
 
-get '/new' do
-  erb :new
+get'/new_post' do
+  erb :new_post
 end
 
-post '/new' do
+post '/new_post' do
   content = params[:content]
 
   if content.length <= 0
   	@error = 'Type post text'
-  	return erb :new
+  	return erb :new_post
   end
 
   @db.execute 'INSERT INTO Posts (content, created_date) VALUES (?, datetime())', [content]
@@ -47,6 +47,8 @@ post '/new' do
   erb "You typed #{content}"
 end
 
-get '/posts' do
-  "Hello World"
+get '/posts/:post_id' do
+	post_id = params[:post_id]
+
+	erb "Displaing information for post with id #{post_id}"
 end
